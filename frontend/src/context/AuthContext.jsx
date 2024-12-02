@@ -71,7 +71,8 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setIsBlocked(false);
     if (message) alert(message);
-    navigate("/login");
+    navigate("/");
+    // navigate("/login");
   };
 
   const logout = () => handleLogout();

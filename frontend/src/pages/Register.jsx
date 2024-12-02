@@ -32,7 +32,8 @@ const Register = () => {
           message: "User registered successfully",
         });
         setTimeout(() => {
-          navigate("/login");
+          // navigate("/login");
+          navigate("/");
         }, 2000);
       } else {
         console.error("Register error: ", response.status);
