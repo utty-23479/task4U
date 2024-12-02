@@ -1,201 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { DataGrid } from "@mui/x-data-grid";
-// import Paper from "@mui/material/Paper";
-//
-// // const rows = [
-// //   { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-// //   { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-// //   { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-// //   { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-// //   { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-// //   { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-// //   { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-// //   { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-// //   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-// // ];
-//
-// const paginationModel = { page: 0, pageSize: 5 };
-//
-// export default function DataTable() {
-//   const [users, setUsers] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [selectedUsers, setSelectedUsers] = useState([]);
-//
-//   useEffect(() => {
-//     const fetchUsers = async () => {
-//       try {
-//         const response = await fetch("http://localhost:5000/api/users/");
-//         const data = await response.json();
-//
-//         const formattedUsers = data.map((user) => ({
-//           ...user,
-//           id: user.id || user._id,
-//         }));
-//
-//         setUsers(formattedUsers);
-//       } catch (error) {
-//         console.error("Error fetching users: ", error);
-//       } finally {
-//         setLoading(false);
-//       }
-//
-//       //   setUsers(data);
-//       // } catch (error) {
-//       //   console.error("Error fetching users: ", error);
-//       // } finally {
-//       //   setLoading(false);
-//       // }
-//     };
-//     fetchUsers();
-//   }, []);
-//
-//   const columns = [
-//     { field: "name", headerName: "Name", width: 150 },
-//     { field: "email", headerName: "Email", width: 250 },
-//     {
-//       field: "last_login_time",
-//       headerName: "Last Login",
-//       width: 160,
-//     },
-//     { field: "status", headerName: "status", width: 100 },
-//   ];
-//
-//   const handleBlockSelected = async () => {
-//     if (selectedUsers.length === 0) {
-//       alert("Please select at least one user");
-//       return;
-//     }
-//     try {
-//       const response = await fetch("http://localhost:5000/api/users/block", {
-//         method: "PATCH",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ ids: selectedUsers }),
-//       });
-//       if (response.ok) {
-//         alert("Selected users have been blocked");
-//         setUsers((prevUsers) =>
-//           prevUsers.map((user) =>
-//             selectedUsers.includes(user.id)
-//               ? { ...user, status: "blocked" }
-//               : user,
-//           ),
-//         );
-//         setSelectedUsers([]); // Limpia la selección
-//       } else {
-//         alert("Failed to block users");
-//       }
-//     } catch (error) {
-//       console.error("Error blocking users:", error);
-//     }
-//   };
-//
-//   const handleUnblockSelected = async () => {
-//     if (selectedUsers.length === 0) {
-//       alert("Please select at least one user");
-//       return;
-//     }
-//     try {
-//       const response = await fetch("http://localhost:5000/api/users/unblock", {
-//         method: "PATCH",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ ids: selectedUsers }),
-//       });
-//       if (response.ok) {
-//         alert("Selected users have been unblocked");
-//         setUsers((prevUsers) =>
-//           prevUsers.map((user) =>
-//             selectedUsers.includes(user.id)
-//               ? { ...user, status: "active" }
-//               : user,
-//           ),
-//         );
-//         setSelectedUsers([]); // Limpia la selección
-//       } else {
-//         alert("Failed to unblock users");
-//       }
-//     } catch (error) {
-//       console.error("Error unblocking users:", error);
-//     }
-//   };
-//
-//   const handleDeleteSelected = async () => {
-//     if (selectedUsers.length === 0) {
-//       alert("Please select at least one user");
-//       return;
-//     }
-//     try {
-//       const response = await fetch("http://localhost:5000/api/users", {
-//         method: "DELETE",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ ids: selectedUsers }),
-//       });
-//       if (response.ok) {
-//         alert("Selected users have been deleted");
-//         setUsers((prevUsers) =>
-//           prevUsers.filter((user) => !selectedUsers.includes(user.id)),
-//         );
-//         setSelectedUsers([]); // Limpia la selección
-//       } else {
-//         alert("Failed to delete users");
-//       }
-//     } catch (error) {
-//       console.error("Error deleting users:", error);
-//     }
-//   };
-//
-//   return (
-//     <>
-//       <div className="flex mb-4">
-//         <button
-//           onClick={handleBlockSelected}
-//           className="flex-no-wrap justify-items-center text-blue-500 border-2 rounded-2xl border-blue-500 pb-2 pt-3 px-4 mr-2"
-//         >
-//           <span>Block</span>
-//           <LockClosedIcon
-//             aria-hidden="true"
-//             className="inline size-5 group-data-[open]:hidden"
-//           ></LockClosedIcon>
-//         </button>
-//         <button
-//           onClick={handleUnblockSelected}
-//           className="flex-no-wrap justify-items-center text-blue-500 border-2 rounded-2xl border-blue-500 p-3 px-4 mr-2"
-//         >
-//           <LockOpenIcon
-//             aria-hidden="true"
-//             className="block size-5 group-data-[open]:hidden "
-//           ></LockOpenIcon>
-//         </button>
-//         <button
-//           onClick={handleDeleteSelected}
-//           className="flex-no-wrap justify-items-center text-red-500 border-2 rounded-2xl border-red-500 p-3 px-4 mr-2"
-//         >
-//           <TrashIcon
-//             aria-hidden="true"
-//             className="block size-5 group-data-[open]:hidden "
-//           ></TrashIcon>
-//         </button>
-//       </div>
-//       <Paper sx={{ height: 600, width: "100%" }}>
-//         {loading ? (
-//           <p>Loading...</p>
-//         ) : (
-//           <DataGrid
-//             rows={users}
-//             columns={columns}
-//             // initialState={{ pagination: { paginationModel } }}
-//             // pageSizeOptions={[5, 10]}
-//             checkboxSelection
-//             onSelectionModelChange={(ids) => {
-//               console.log("Selected IDs: ", ids);
-//               setSelectedUsers(ids);
-//             }}
-//           />
-//         )}
-//       </Paper>
-//     </>
-//   );
-// }
-
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -208,6 +10,7 @@ import {
   Checkbox,
   Button,
   TablePagination,
+  TableSortLabel,
 } from "@mui/material";
 import {
   LockClosedIcon,
@@ -215,12 +18,25 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/solid";
 
+const formatDate = (dateString) => {
+  const date = new date(dateString);
+  const options = {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return date.toLocaleString("en-US", options).replace(",", "");
+};
+
 export default function EnhancedTable() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("name");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -259,6 +75,23 @@ export default function EnhancedTable() {
     };
     fetchUsers();
   }, []);
+
+  const handleRequestSort = (property) => {
+    const isAscending = orderBy === property && order === "asc";
+    setOrder(isAscending ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const sortedUsers = users.sort((a, b) => {
+    if (orderBy === "last_login_time") {
+      const dateA = new Date(a[orderBy]);
+      const dateB = new Date(b[orderBy]);
+      return order === "asc" ? dateA - dateB : dateB - dateA;
+    }
+    if (a[orderBy] < b[orderBy]) return order === "asc" ? -1 : 1;
+    if (a[orderBy] > b[orderBy]) return order === "asc" ? 1 : -1;
+    return 0;
+  });
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -429,33 +262,86 @@ export default function EnhancedTable() {
                         onChange={handleSelectAllClick}
                       />
                     </TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Last Login</TableCell>
-                    <TableCell>Status</TableCell>
+                    {/* <TableCell>Name</TableCell> */}
+                    {/* <TableCell>Email</TableCell> */}
+                    {/* <TableCell>Last Login</TableCell> */}
+                    {/* <TableCell>Status</TableCell> */}
+
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === "name"}
+                        direction={order}
+                        onClick={() => handleRequestSort("name")}
+                      >
+                        Name
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === "email"}
+                        direction={order}
+                        onClick={() => handleRequestSort("email")}
+                      >
+                        Email
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === "last_login_time"}
+                        direction={order}
+                        onClick={() => handleRequestSort("last_login_time")}
+                      >
+                        Last Login
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === "status"}
+                        direction={order}
+                        onClick={() => handleRequestSort("status")}
+                      >
+                        Status
+                      </TableSortLabel>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {users
+                  {/* {users */}
+                  {/*   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) */}
+                  {/*   .map((user) => { */}
+                  {/*     const isItemSelected = isSelected(user.id); */}
+                  {/*     return ( */}
+                  {/*       <TableRow */}
+                  {/*         key={user.id} */}
+                  {/*         selected={isItemSelected} */}
+                  {/*         onClick={() => handleClick(user.id)} */}
+                  {/*       > */}
+                  {/*         <TableCell padding="checkbox"> */}
+                  {/*           <Checkbox checked={isItemSelected} /> */}
+                  {/*         </TableCell> */}
+                  {/*         <TableCell>{user.name}</TableCell> */}
+                  {/*         <TableCell>{user.email}</TableCell> */}
+                  {/*         <TableCell>{user.last_login_time}</TableCell> */}
+                  {/*         <TableCell>{user.status}</TableCell> */}
+                  {/*       </TableRow> */}
+                  {/*     ); */}
+                  {/*   })} */}
+                  {sortedUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((user) => {
-                      const isItemSelected = isSelected(user.id);
-                      return (
-                        <TableRow
-                          key={user.id}
-                          selected={isItemSelected}
-                          onClick={() => handleClick(user.id)}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox checked={isItemSelected} />
-                          </TableCell>
-                          <TableCell>{user.name}</TableCell>
-                          <TableCell>{user.email}</TableCell>
-                          <TableCell>{user.last_login_time}</TableCell>
-                          <TableCell>{user.status}</TableCell>
-                        </TableRow>
-                      );
-                    })}
+                    .map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell padding="checkbox">
+                          <Checkbox checked={selectedUsers.includes(user.id)} />
+                        </TableCell>
+                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        {/* <TableCell>{user.last_login_time}</TableCell> */}
+                        <TableCell>
+                          {formatDate(user.last_login_time)}
+                        </TableCell>
+                        <TableCell>{user.status}</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -465,8 +351,12 @@ export default function EnhancedTable() {
               count={users.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+              // onPageChange={handleChangePage}
+              // onRowsPerPageChange={handleChangeRowsPerPage}
+              onPageChange={(event, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(event) =>
+                setRowsPerPage(parseInt(event.target.value, 10))
+              }
             />
           </>
         )}
