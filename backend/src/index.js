@@ -25,6 +25,15 @@ app.use(
   }),
 );
 
+app.use((req, res, next) => {
+  console.log(
+    "CORS Origin Allowed:",
+    process.env.CLIENT_ORIGIN_DEV,
+    process.env.CLIENT_ORIGIN_PROD,
+  );
+  next();
+});
+
 // app.use("/api/users", usersRouter);
 app.use("/api/users/", usersRouterSupa);
 app.listen(port, () => console.log(`Server listening on port ${port}`));
