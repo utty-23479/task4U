@@ -336,7 +336,6 @@ export default function EnhancedTable() {
                   {/*       <TableCell>{user.name}</TableCell> */}
                   {/*       <TableCell>{user.email}</TableCell> */}
                   {/*       {/* <TableCell>{user.last_login_time}</TableCell> */}{" "}
-                  */}
                   {/*       <TableCell> */}
                   {/*         {formatDate(user.last_login_time)} */}
                   {/*       </TableCell> */}
