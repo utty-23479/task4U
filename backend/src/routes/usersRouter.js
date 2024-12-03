@@ -66,10 +66,18 @@ router.post("/login", async (req, res) => {
       //   [user.id],
       // );
 
-      await supabase
+      // await supabase
+      //   .from("users")
+      //   .update({ last_login_time: new Date().toISOString() })
+      //   .eq("id", user.id);
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}.${String(now.getMilliseconds()).padStart(3, "0")}`;
+      const { data, error } = await supabase
         .from("users")
-        .update({ last_login_time: new Date().toISOString() })
+        .update({ last_login_time: formattedDate })
         .eq("id", user.id);
+
+      console.log(data, " DATTTTTTTOOOOS,   ERRRRRRRRROOOOOOR: ", error);
 
       return res.json({
         success: true,
