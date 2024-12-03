@@ -60,6 +60,7 @@ router.post("/login", async (req, res) => {
       const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
         expiresIn: "1h",
       });
+      console.log("user activo");
 
       try {
         const { data, error } = await supabase
@@ -67,6 +68,7 @@ router.post("/login", async (req, res) => {
           .update({ last_login_time: new Date().toISOString() })
           .eq("id", user.id)
           .select();
+        console.log("fecha actualizada");
 
         if (error) {
           console.error("Error updating last_login_time:", {
@@ -74,12 +76,10 @@ router.post("/login", async (req, res) => {
             details: error.details,
             code: error.code,
           });
-          return res
-            .status(500)
-            .json({
-              error: "failed to update login time",
-              details: error.message,
-            });
+          return res.status(500).json({
+            error: "failed to update login time",
+            details: error.message,
+          });
         }
       } catch (updateError) {
         console.error("Supabase update error:", updateError);
