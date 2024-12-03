@@ -61,10 +61,15 @@ router.post("/login", async (req, res) => {
         expiresIn: "1h",
       });
 
-      await pool.query(
-        "UPDATE users SET last_login_time = NOW() WHERE id = $1",
-        [user.id],
-      );
+      // await pool.query(
+      //   "UPDATE users SET last_login_time = NOW() WHERE id = $1",
+      //   [user.id],
+      // );
+
+      await supabase
+        .from("users")
+        .update({ last_login_time: new Date() })
+        .eq("id", user.id);
 
       return res.json({
         success: true,
