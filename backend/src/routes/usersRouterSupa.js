@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const supabase = require("../config/db"); // Usamos Supabase aquí
+const pool = require("../config/db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const authenticateToken = require("../middlewares/authenticateToken");
@@ -13,14 +13,10 @@ router.get("/protected-route", authenticateToken, (req, res) => {
 
 router.get("/check-blocked", authenticateToken, async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("status")
-      .eq("id", req.user.id)
-      .single();
-
-    if (error) throw error;
-    const isBlocked = data.status === "blocked";
+    const result = await pool.query("SELECT status FROM users WHERE id = $1", [
+      req.user.id,
+    ]);
+    const isBlocked = result.rows[0].status === "blocked";
     res.json({ isBlocked });
   } catch (error) {
     console.error("Error checking block status:", error);
@@ -30,16 +26,12 @@ router.get("/check-blocked", authenticateToken, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .order("last_login_time", { ascending: false });
-
-    if (error) throw error;
-    res.json(data);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ error: "Internal server error" });
+    const result = await pool.query(
+      "SELECT * FROM users ORDER BY last_login_time DESC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching users" });
   }
 });
 
@@ -50,41 +42,75 @@ router.post("/login", async (req, res) => {
   if (!password) return res.status(400).json({ error: "Password is required" });
 
   try {
-    const { data: users, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("email", email)
-      .single();
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "User not found" });
 
-    if (error) throw error;
-    if (!users) return res.status(404).json({ error: "User not found" });
+    const user = result.rows[0];
 
-    const isPasswordValid = await bcrypt.compare(password, users.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log(isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-
-    if (users.status === "active") {
-      const token = jwt.sign({ id: users.id, email: users.email }, JWT_SECRET, {
+    if (user.status === "active") {
+      console.log(user.status);
+      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
         expiresIn: "1h",
       });
+      console.log("user activo");
+
+      try {
+        const { data, error } = await supabase
+          .from("users")
+          .update({ last_login_time: new Date().toISOString() })
+          .eq("id", user.id)
+          .select();
+        console.log("fecha actualizada");
+
+        if (error) {
+          console.error("Error updating last_login_time:", {
+            message: error.message,
+            details: error.details,
+            code: error.code,
+          });
+          return res.status(500).json({
+            error: "failed to update login time",
+            details: error.message,
+          });
+        }
+      } catch (updateError) {
+        console.error("Supabase update error:", updateError);
+      }
+
       return res.json({
         success: true,
         token,
-        userinfo: { status: users.status, email: users.email },
+        userinfo: { status: user.status, email: user.email },
       });
     } else {
       return res.status(401).json({ error: "User blocked" });
     }
+
+    // const dbEmail = result.rows[0].email;
+    // const dbPassword = result.rows[0].password;
+    // if (email === dbEmail && password === dbPassword)
+    //   return res.json({ success: true, user: result.rows[0] });
+    // else {
+    //   return res
+    //     .status(401)
+    //     .json({ success: false, error: "Invalid credentials" });
+    // }
   } catch (error) {
-    console.error("Error logging in:", error);
+    console.error("Error logging in: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
 router.post("/registeruser", async (req, res) => {
   const { firstname, lastname, email, password } = req.body;
-
   if (!firstname || !lastname || !email || !password) {
     return res.status(400).json({
       error: "All fields (firstname, lastname, email, password) are required",
@@ -93,42 +119,36 @@ router.post("/registeruser", async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const { error } = await supabase.from("users").insert([
-      {
-        name: `${firstname} ${lastname}`,
-        email,
-        password: hashedPassword,
-        status: "active",
-      },
-    ]);
 
-    if (error) throw error;
-
-    res.status(201).json({
+    const result = await pool.query(
+      `INSERT INTO users (name, email, password) VALUES($1, $2, $3)`,
+      [`${firstname} ${lastname}`, email, hashedPassword],
+    );
+    return res.status(201).json({
       success: true,
       message: "User created successfully",
     });
   } catch (error) {
-    console.error("Error inserting user:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error inserting user: ", error);
+    if (error.code === "23505")
+      return res
+        .status(409)
+        .json({ success: false, error: "Email already exists" });
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
   }
 });
 
 router.patch("/block", async (req, res) => {
   const { ids } = req.body;
-
   if (!ids || ids.length === 0) {
     return res.status(400).json({ error: "No user IDs provided" });
   }
-
   try {
-    const { error } = await supabase
-      .from("users")
-      .update({ status: "blocked" })
-      .in("id", ids);
-
-    if (error) throw error;
-
+    await pool.query("UPDATE users SET status = 'blocked' WHERE id = ANY($1)", [
+      ids,
+    ]);
     res.json({ success: true, message: "Users blocked successfully" });
   } catch (error) {
     console.error("Error blocking users:", error);
@@ -138,22 +158,18 @@ router.patch("/block", async (req, res) => {
 
 router.patch("/unblock", async (req, res) => {
   const { ids } = req.body;
-
   if (!ids || ids.length === 0) {
     return res.status(400).json({ error: "No user IDs provided" });
   }
-
   try {
-    const { error } = await supabase
-      .from("users")
-      .update({ status: "active" })
-      .in("id", ids);
-
-    if (error) throw error;
-
+    await pool.query("UPDATE users SET status = 'active' WHERE id = ANY($1)", [
+      ids,
+    ]);
+    const requesterBlocked = ids.includes(req.user.id);
     res.json({
       success: true,
       message: "Users unblocked successfully",
+      requesterBlocked,
     });
   } catch (error) {
     console.error("Error unblocking users:", error);
@@ -163,21 +179,49 @@ router.patch("/unblock", async (req, res) => {
 
 router.delete("/", async (req, res) => {
   const { ids } = req.body;
-
   if (!ids || ids.length === 0) {
     return res.status(400).json({ error: "No user IDs provided" });
   }
-
   try {
-    const { error } = await supabase.from("users").delete().in("id", ids);
-
-    if (error) throw error;
-
+    await pool.query("DELETE FROM users WHERE id = ANY($1)", [ids]);
     res.json({ success: true, message: "Users deleted successfully" });
   } catch (error) {
     console.error("Error deleting users:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// router.patch("/block/:id", async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     await pool.query("UPDATE users SET status = 'blocked' WHERE id = $1", [id]);
+//     res.json({ success: true, message: "User blocked successfully" });
+//   } catch (error) {
+//     console.error("Error blocking user: ", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+//
+// router.patch("/unblock/:id", async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     await pool.query("UPDATE users SET status = 'active' WHERE id = $1", [id]);
+//     res.json({ success: true, message: "User unblocked successfully" });
+//   } catch (error) {
+//     console.error("Error unblocking user: ", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+//
+// router.delete("/:id", async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     await pool.query("DELETE FROM users WHERE id = $1", [id]);
+//     res.json({ success: true, message: "User deleted successfully" });
+//   } catch (error) {
+//     console.error("Error deleting user: ", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 
 module.exports = router;
