@@ -326,22 +326,50 @@ export default function EnhancedTable() {
                   {/*       </TableRow> */}
                   {/*     ); */}
                   {/*   })} */}
+                  {/* {sortedUsers */}
+                  {/*   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) */}
+                  {/*   .map((user) => ( */}
+                  {/*     <TableRow key={user.id}> */}
+                  {/*       <TableCell padding="checkbox"> */}
+                  {/*         <Checkbox checked={selectedUsers.includes(user.id)} /> */}
+                  {/*       </TableCell> */}
+                  {/*       <TableCell>{user.name}</TableCell> */}
+                  {/*       <TableCell>{user.email}</TableCell> */}
+                  {/*       {/* <TableCell>{user.last_login_time}</TableCell> */}{" "}
+                  */}
+                  {/*       <TableCell> */}
+                  {/*         {formatDate(user.last_login_time)} */}
+                  {/*       </TableCell> */}
+                  {/*       <TableCell>{user.status}</TableCell> */}
+                  {/*     </TableRow> */}
+                  {/*   ))} */}
                   {sortedUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUsers.includes(user.id)} />
-                        </TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        {/* <TableCell>{user.last_login_time}</TableCell> */}
-                        <TableCell>
-                          {formatDate(user.last_login_time)}
-                        </TableCell>
-                        <TableCell>{user.status}</TableCell>
-                      </TableRow>
-                    ))}
+                    .map((user) => {
+                      const isItemSelected = isSelected(user.id); // Check if the user is selected
+                      return (
+                        <TableRow
+                          key={user.id}
+                          hover
+                          role="checkbox"
+                          aria-checked={isItemSelected}
+                          selected={isItemSelected}
+                        >
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={isItemSelected}
+                              onChange={() => handleClick(user.id)} // Call the handleClick function
+                            />
+                          </TableCell>
+                          <TableCell>{user.name}</TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>
+                            {formatDate(user.last_login_time)}
+                          </TableCell>
+                          <TableCell>{user.status}</TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
             </TableContainer>
