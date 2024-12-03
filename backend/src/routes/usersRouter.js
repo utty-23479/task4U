@@ -62,13 +62,24 @@ router.post("/login", async (req, res) => {
       });
 
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("users")
           .update({ last_login_time: new Date().toISOString() })
-          .eq("id", user.id);
+          .eq("id", user.id)
+          .select();
 
         if (error) {
-          console.error("Error updating last_login_time:", error);
+          console.error("Error updating last_login_time:", {
+            message: error.message,
+            details: error.details,
+            code: error.code,
+          });
+          return res
+            .status(500)
+            .json({
+              error: "failed to update login time",
+              details: error.message,
+            });
         }
       } catch (updateError) {
         console.error("Supabase update error:", updateError);
