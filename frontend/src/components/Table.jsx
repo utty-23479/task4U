@@ -19,7 +19,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 const formatDate = (dateString) => {
-  const date = new date(dateString);
+  const date = new Date(dateString);
   const options = {
     month: "2-digit",
     day: "2-digit",
@@ -49,7 +49,7 @@ export default function EnhancedTable() {
       try {
         const response = await fetch(`${import.meta.env.VITE_API}api/users/`, {
           method: "GET",
-          header: {
+          headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
