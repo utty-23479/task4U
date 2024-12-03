@@ -66,9 +66,14 @@ router.post("/login", async (req, res) => {
       //   [user.id],
       // );
 
+      // await supabase
+      //   .from("users")
+      //   .update({ last_login_time: new Date() })
+      //   .eq("id", user.id);
+
       await supabase
         .from("users")
-        .update({ last_login_time: new Date() })
+        .update({ last_login_time: new Date().toISOString() })
         .eq("id", user.id);
 
       return res.json({
