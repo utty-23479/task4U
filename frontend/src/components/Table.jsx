@@ -206,7 +206,7 @@ export default function EnhancedTable() {
         <Button
           variant="contained"
           sx={{
-            backgroundColor: "blue", // Botón azul
+            backgroundColor: "blue",
             color: "white",
             "&:hover": {
               backgroundColor: "darkblue",
@@ -224,10 +224,10 @@ export default function EnhancedTable() {
         <Button
           variant="contained"
           sx={{
-            backgroundColor: "red", // Botón rojo
+            backgroundColor: "red",
             color: "white",
             "&:hover": {
-              backgroundColor: "darkred", // Rojo más oscuro al pasar el cursor
+              backgroundColor: "darkred",
             },
           }}
           className="text-red-500"
@@ -262,11 +262,6 @@ export default function EnhancedTable() {
                         onChange={handleSelectAllClick}
                       />
                     </TableCell>
-                    {/* <TableCell>Name</TableCell> */}
-                    {/* <TableCell>Email</TableCell> */}
-                    {/* <TableCell>Last Login</TableCell> */}
-                    {/* <TableCell>Status</TableCell> */}
-
                     <TableCell>
                       <TableSortLabel
                         active={orderBy === "name"}
@@ -306,45 +301,10 @@ export default function EnhancedTable() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {/* {users */}
-                  {/*   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) */}
-                  {/*   .map((user) => { */}
-                  {/*     const isItemSelected = isSelected(user.id); */}
-                  {/*     return ( */}
-                  {/*       <TableRow */}
-                  {/*         key={user.id} */}
-                  {/*         selected={isItemSelected} */}
-                  {/*         onClick={() => handleClick(user.id)} */}
-                  {/*       > */}
-                  {/*         <TableCell padding="checkbox"> */}
-                  {/*           <Checkbox checked={isItemSelected} /> */}
-                  {/*         </TableCell> */}
-                  {/*         <TableCell>{user.name}</TableCell> */}
-                  {/*         <TableCell>{user.email}</TableCell> */}
-                  {/*         <TableCell>{user.last_login_time}</TableCell> */}
-                  {/*         <TableCell>{user.status}</TableCell> */}
-                  {/*       </TableRow> */}
-                  {/*     ); */}
-                  {/*   })} */}
-                  {/* {sortedUsers */}
-                  {/*   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) */}
-                  {/*   .map((user) => ( */}
-                  {/*     <TableRow key={user.id}> */}
-                  {/*       <TableCell padding="checkbox"> */}
-                  {/*         <Checkbox checked={selectedUsers.includes(user.id)} /> */}
-                  {/*       </TableCell> */}
-                  {/*       <TableCell>{user.name}</TableCell> */}
-                  {/*       <TableCell>{user.email}</TableCell> */}
-                  {/*       {/* <TableCell>{user.last_login_time}</TableCell> */}{" "}
-                  {/*       <TableCell> */}
-                  {/*         {formatDate(user.last_login_time)} */}
-                  {/*       </TableCell> */}
-                  {/*       <TableCell>{user.status}</TableCell> */}
-                  {/*     </TableRow> */}
                   {sortedUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((user) => {
-                      const isItemSelected = isSelected(user.id); // Check if the user is selected
+                      const isItemSelected = isSelected(user.id);
                       return (
                         <TableRow
                           key={user.id}
@@ -356,7 +316,7 @@ export default function EnhancedTable() {
                           <TableCell padding="checkbox">
                             <Checkbox
                               checked={isItemSelected}
-                              onChange={() => handleClick(user.id)} // Call the handleClick function
+                              onChange={() => handleClick(user.id)}
                             />
                           </TableCell>
                           <TableCell>{user.name}</TableCell>
@@ -377,8 +337,6 @@ export default function EnhancedTable() {
               count={users.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              // onPageChange={handleChangePage}
-              // onRowsPerPageChange={handleChangeRowsPerPage}
               onPageChange={(event, newPage) => setPage(newPage)}
               onRowsPerPageChange={(event) =>
                 setRowsPerPage(parseInt(event.target.value, 10))

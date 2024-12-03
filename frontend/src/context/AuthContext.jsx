@@ -24,26 +24,6 @@ const AuthProvider = ({ children }) => {
     }
   }, [isBlocked]);
 
-  // useEffect(() => {
-  //   const savedToken = localStorage.getItem("token");
-  //   if (savedToken) {
-  //     setToken(savedToken);
-  //     const checkBlockedStatus = async () => {
-  //       const response = await fetch("api/check-blocked", {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${savedToken}`,
-  //         },
-  //       });
-  //       const data = await response.json();
-  //       if (data.isBlocked) {
-  //         handleLogout("You've been blocked");
-  //       }
-  //     };
-  //     checkBlockedStatus();
-  //   }
-  // }, []);
-
   const checkBlockedStatus = async (token) => {
     try {
       const response = await fetch("api/check-blocked", {
@@ -72,7 +52,6 @@ const AuthProvider = ({ children }) => {
     setIsBlocked(false);
     if (message) alert(message);
     navigate("/");
-    // navigate("/login");
   };
 
   const logout = () => handleLogout();

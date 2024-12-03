@@ -93,16 +93,6 @@ router.post("/login", async (req, res) => {
     } else {
       return res.status(401).json({ error: "User blocked" });
     }
-
-    // const dbEmail = result.rows[0].email;
-    // const dbPassword = result.rows[0].password;
-    // if (email === dbEmail && password === dbPassword)
-    //   return res.json({ success: true, user: result.rows[0] });
-    // else {
-    //   return res
-    //     .status(401)
-    //     .json({ success: false, error: "Invalid credentials" });
-    // }
   } catch (error) {
     console.error("Error logging in: ", error);
     res.status(500).json({ error: "Internal server error" });
@@ -190,38 +180,4 @@ router.delete("/", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// router.patch("/block/:id", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     await pool.query("UPDATE users SET status = 'blocked' WHERE id = $1", [id]);
-//     res.json({ success: true, message: "User blocked successfully" });
-//   } catch (error) {
-//     console.error("Error blocking user: ", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-//
-// router.patch("/unblock/:id", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     await pool.query("UPDATE users SET status = 'active' WHERE id = $1", [id]);
-//     res.json({ success: true, message: "User unblocked successfully" });
-//   } catch (error) {
-//     console.error("Error unblocking user: ", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-//
-// router.delete("/:id", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     await pool.query("DELETE FROM users WHERE id = $1", [id]);
-//     res.json({ success: true, message: "User deleted successfully" });
-//   } catch (error) {
-//     console.error("Error deleting user: ", error);
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
 module.exports = router;

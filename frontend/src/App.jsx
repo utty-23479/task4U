@@ -13,7 +13,6 @@ function App() {
       <Router>
         <AuthProvider>
           <Routes>
-            {/* <Route path="/login" element={<Login></Login>}></Route> */}
             <Route path="/" element={<Login></Login>}></Route>
             <Route path="/register" element={<Register></Register>}></Route>
             <Route
@@ -24,9 +23,6 @@ function App() {
                     <Table></Table>
                   </Dashboard>
                 </ProtectedRoute>
-                // <Dashboard>
-                //   <Table></Table>
-                // </Dashboard>
               }
             ></Route>
           </Routes>
