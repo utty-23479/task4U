@@ -61,23 +61,18 @@ router.post("/login", async (req, res) => {
         expiresIn: "1h",
       });
 
-      // await pool.query(
-      //   "UPDATE users SET last_login_time = NOW() WHERE id = $1",
-      //   [user.id],
-      // );
+      try {
+        const { error } = await supabase
+          .from("users")
+          .update({ last_login_time: new Date().toISOString() })
+          .eq("id", user.id);
 
-      // await supabase
-      //   .from("users")
-      //   .update({ last_login_time: new Date().toISOString() })
-      //   .eq("id", user.id);
-      const now = new Date();
-      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}.${String(now.getMilliseconds()).padStart(3, "0")}`;
-      const { data, error } = await supabase
-        .from("users")
-        .update({ last_login_time: formattedDate })
-        .eq("id", user.id);
-
-      console.log(data, " DATTTTTTTOOOOS,   ERRRRRRRRROOOOOOR: ", error);
+        if (error) {
+          console.error("Error updating last_login_time:", error);
+        }
+      } catch (updateError) {
+        console.error("Supabase update error:", updateError);
+      }
 
       return res.json({
         success: true,
