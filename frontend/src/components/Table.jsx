@@ -35,8 +35,8 @@ export default function EnhancedTable() {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
+  const [order, setOrder] = useState("desc");
+  const [orderBy, setOrderBy] = useState("last_login_time");
 
   useEffect(() => {
     const fetchUsers = async () => {

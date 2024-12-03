@@ -60,6 +60,12 @@ router.post("/login", async (req, res) => {
       const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
         expiresIn: "1h",
       });
+
+      await pool.query(
+        "UPDATE users SET last_login_time = NOW() WHERE id = $1",
+        [user.id],
+      );
+
       return res.json({
         success: true,
         token,
