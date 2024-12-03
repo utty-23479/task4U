@@ -342,7 +342,6 @@ export default function EnhancedTable() {
                   {/*       </TableCell> */}
                   {/*       <TableCell>{user.status}</TableCell> */}
                   {/*     </TableRow> */}
-                  {/*   ))} */}
                   {sortedUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((user) => {
