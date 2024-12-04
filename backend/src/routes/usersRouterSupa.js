@@ -156,12 +156,10 @@ router.patch("/unblock", async (req, res) => {
   }
 
   try {
-    // const { error } = await supabase
-    //   .from("users")
-    //   .update({ status: "active" })
-    //   .in("id", ids);
-
-    await supabase.from("users").update({ status: "active" }).in("id", ids);
+    const { error } = await supabase
+      .from("users")
+      .update({ status: "active" })
+      .in("id", ids);
 
     if (error) throw error;
 
