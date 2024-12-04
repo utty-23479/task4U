@@ -133,7 +133,7 @@ export default function EnhancedTable() {
         action === "block"
           ? `${import.meta.env.VITE_API}api/users/block`
           : action === "unblock"
-            ? `${import.meta.env.VITE_API}api/users/block`
+            ? `${import.meta.env.VITE_API}api/users/unblock`
             : `${import.meta.env.VITE_API}api/users`;
 
       const method = action === "delete" ? "DELETE" : "PATCH";
