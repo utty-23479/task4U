@@ -145,11 +145,18 @@ export default function EnhancedTable() {
       });
 
       if (response.ok) {
+        // const updatedUsers =
+        //   action === "block"
+        //     ? users.map((user) =>
+        //         selectedUsers.includes(user.id)
+        //           ? { ...user, status: "blocked" }
+        //           : user,
+        //       )
         const updatedUsers =
-          action === "block"
+          action === "unblock"
             ? users.map((user) =>
                 selectedUsers.includes(user.id)
-                  ? { ...user, status: "blocked" }
+                  ? { ...user, status: "active" }
                   : user,
               )
             : action === "unblock"
